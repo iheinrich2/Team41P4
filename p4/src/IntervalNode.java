@@ -32,6 +32,7 @@ public class IntervalNode<T extends Comparable<T>> {
 	 */
 	public IntervalNode(IntervalADT<T> interval) {
 		// TODO
+		this.interval = interval;
 	}
 
 	/**
@@ -42,6 +43,11 @@ public class IntervalNode<T extends Comparable<T>> {
 	 */
 	public IntervalNode<T> getSuccessor() {
 		// TODO
+		if (rightNode != null) {
+            return minValue(rightNode.getRightNode());
+        }
+		else return null;
+		
 	}
 
 	/**
@@ -122,4 +128,17 @@ public class IntervalNode<T extends Comparable<T>> {
 	public void setRightNode(IntervalNode<T> rightNode) {
 		this.rightNode = rightNode;
 	}
+	
+	/* Given a non-empty binary search tree, return the minimum data  
+    value found in that tree. Note that the entire tree does not need
+    to be searched. */
+   IntervalNode<T> minValue(IntervalNode<T> node) {
+	   IntervalNode<T> current = node;
+
+       /* loop down to find the leftmost leaf */
+       while (current.getLeftNode() != null) {
+           current = current.getLeftNode();
+       }
+       return current;
+   }
 }
