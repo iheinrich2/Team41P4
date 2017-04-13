@@ -1,28 +1,40 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T> {
 	
-	// TODO declare any data members needed for this class
-	private IntervalNode <T> root;
-	private int height;
+	private IntervalNode<T> root;
 	private int size;
+	private int height;
+
+	public IntervalTree(){
+		root = null;
+	}
+	public IntervalTree(IntervalNode<T> root){
+		this.root = root;
+	}
 	@Override
 	public IntervalNode<T> getRoot() {
-		// TODO Auto-generated method stub
 		return root;
 	}
 
 	@Override
 	public void insert(IntervalADT<T> interval)
 					throws IllegalArgumentException {
-		// TODO Auto-generated method stub
+		if (interval == null){
+			throw new IllegalArgumentException();
+		}
 
 	}
 
 	@Override
 	public void delete(IntervalADT<T> interval)
 					throws IntervalNotFoundException, IllegalArgumentException {
-		// TODO Auto-generated method stub
+		if (interval == null){
+			throw new IllegalArgumentException();
+		}
+		deleteHelper(root, interval);
+		
 
 	}
 
@@ -30,50 +42,96 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	public IntervalNode<T> deleteHelper(IntervalNode<T> node,
 					IntervalADT<T> interval)
 					throws IntervalNotFoundException, IllegalArgumentException {
-						return node;
-		// TODO Auto-generated method stub
+			if(node == null){
+				throw new IntervalNotFoundException(node.toString());
+			}
+			
+			if(node.getInterval().compareTo(interval) == 0){
+				if(!(node.getRightNode() == null)){
+					node.setInterval(node.getSuccessor().getInterval());
+					deleteHelper(node.getSuccessor(), interval);
+					
+					node.setMaxEnd(node.getSuccessor().getMaxEnd());
+					
+					return node;
+				}
+				if(node.getRightNode() == null){
+					return node.getLeftNode();
+					
+				}
+			}
+			if(node.getInterval().compareTo(interval) < 0){
+				node.setRightNode(deleteHelper(node.getRightNode(), interval));
+				//TODO write this method
+				updateMaxEnd();
+				
+			}
+			if(node.getInterval().compareTo(interval) > 0){
+				node.setLeftNode(deleteHelper(node.getLeftNode(), interval));
+				//TODO write this method
+				updateMaxEnd();
+			}
+			
+			return null;
 	}
 
 	@Override
 	public List<IntervalADT<T>> findOverlapping(
 					IntervalADT<T> interval) {
-						return null;
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public List<IntervalADT<T>> searchPoint(T point) {
-		
-		return null;
-		// TODO Auto-generated method stub
+		if(point == null){
+			throw new IllegalArgumentException();
+		}
+		List<IntervalADT<T>> output = new ArrayList<IntervalADT<T>>();
+		searchPointHelper(point, root, output);
+		return output;
+	}
+	
+	private void searchPointHelper(T point,
+			IntervalNode<T> node, List<IntervalADT<T>> output){
+		if(node == null){
+			return;
+		}
+		if(node.getInterval().contains(point)){
+			output.add(node.getInterval());
+		}
+		searchPointHelper(point, node.getRightNode(), output);
+		searchPointHelper(point, node.getLeftNode(), output);
 	}
 
 	@Override
 	public int getSize() {
 		return size;
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public int getHeight() {
 		return height;
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public boolean contains(IntervalADT<T> interval) {
-		return false;
 		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void printStats() {
-		// TODO Auto-generated method stub
 		System.out.println("-----------------------------------------");
 		System.out.println("Height: " + height);
 		System.out.println("Size: " + size);
 		System.out.println("-----------------------------------------");
 	}
 
-}
+	/*
+	 * Method to check if necessary to update the max end, and then updating
+	 * if it does.
+	 */
 
+	private void updateMaxEnd(){
+		
+	}
+}
