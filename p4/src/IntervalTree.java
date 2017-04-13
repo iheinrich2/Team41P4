@@ -21,10 +21,59 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	@Override
 	public void insert(IntervalADT<T> interval)
 					throws IllegalArgumentException {
+		// TODO Auto-generated method stub
+		if (size == 0){
+			root = insertHelper(this.root, interval);
+			size += 1;
+		}
+		else {
+			insertHelper(this.root, interval);
+			size += 1;
+		}
+	}
+	private IntervalNode<T> insertHelper(IntervalNode<T> node,
+					IntervalADT<T> interval) throws IllegalArgumentException {
 		if (interval == null){
 			throw new IllegalArgumentException();
 		}
+		if (node == null){
+			node = new IntervalNode<T>(interval);
+			return node;
+		}
+		
+		int k = node.getInterval().getStart().compareTo(interval.getStart());
+		if (k == 0){
+			int i = node.getInterval().getEnd().compareTo(interval.getEnd());
+			
+			//duplicate throw exception
+			if (i == 0){
+				throw new IllegalArgumentException();
+			}
+			else if (i == 1){
+				IntervalNode<T> newNode = insertHelper(node.getRightNode(), interval);
+				node.setRightNode(newNode);
+				return insertHelper(node.getRightNode(), interval);
+			}
+			else if (i == -1){
+				IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
+				node.setLeftNode(newNode);
+				return insertHelper(node.getLeftNode(), interval);
 
+			}
+		}
+		else if (k == 1){
+			IntervalNode<T> newNode = insertHelper(node.getRightNode(), interval);
+			node.setRightNode(newNode);
+			return insertHelper(node.getRightNode(), interval);
+
+		}
+		else {
+			IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
+			node.setLeftNode(newNode);
+			return insertHelper(node.getLeftNode(), interval);
+		}
+		return node;
+		
 	}
 
 	@Override
