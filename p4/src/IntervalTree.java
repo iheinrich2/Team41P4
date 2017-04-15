@@ -42,10 +42,16 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 			case 1:
 				IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
 				node.setLeftNode(newNode);
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
+					node.setMaxEnd(interval.getEnd());
+				}
 				return node;
 			case -1:
 				IntervalNode<T> diffNode = insertHelper(node.getRightNode(), interval);
 				node.setRightNode(diffNode);
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
+					node.setMaxEnd(interval.getEnd());
+				}
 				return node;
 			default:
 				throw new IllegalArgumentException();
