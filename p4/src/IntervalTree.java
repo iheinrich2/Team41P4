@@ -136,12 +136,34 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 
 	@Override
 	public int getHeight() {
+		if (size == 1){
+			height = 1;
+		}
+		if (size == 2){
+			height = 2;
+		}
 		return height;
+		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public boolean contains(IntervalADT<T> interval) {
+		return containsHelper(root, interval);
 		// TODO Auto-generated method stub
+	}
+	private boolean containsHelper(IntervalNode<T> node, IntervalADT<T> interval){
+		if (interval == null){
+			throw new IllegalArgumentException();
+		}
+		if (node == null){
+			return false;
+		}
+		if (node.getInterval().compareTo(interval) == 0){
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	@Override
