@@ -30,21 +30,22 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		if (interval == null){
 			throw new IllegalArgumentException();
 		}
-		if (node == null){
-			IntervalNode<T> newNode = new IntervalNode<T>(interval);
-			newNode.setMaxEnd(newNode.getInterval().getEnd());
-			return newNode;
+		else if (node == null){
+			node = new IntervalNode<T>(interval);
+			node.setMaxEnd(node.getInterval().getEnd());
+			return node;
 		}
 		else {
-			int k = node.getInterval().compareTo(interval);
+			int k = 0;
+			k = node.getInterval().compareTo(interval);
 			switch (k){
 			case 1:
-				insertHelper(node.getRightNode(), interval);
-				node.setLeftNode(insertHelper(node.getRightNode(), interval));
+				IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
+				node.setLeftNode(newNode);
 				return node;
 			case -1:
-				insertHelper(node.getLeftNode(), interval);
-				node.setRightNode(insertHelper(node.getLeftNode(), interval));
+				IntervalNode<T> diffNode = insertHelper(node.getRightNode(), interval);
+				node.setRightNode(diffNode);
 				return node;
 			default:
 				throw new IllegalArgumentException();
