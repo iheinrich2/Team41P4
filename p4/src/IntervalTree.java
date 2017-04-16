@@ -94,14 +94,12 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 			}
 			if(node.getInterval().compareTo(interval) < 0){
 				node.setRightNode(deleteHelper(node.getRightNode(), interval));
-				//TODO write this method
-				updateMaxEnd();
+				updateMaxEnd(node);
 				
 			}
 			if(node.getInterval().compareTo(interval) > 0){
 				node.setLeftNode(deleteHelper(node.getLeftNode(), interval));
-				//TODO write this method
-				updateMaxEnd();
+				updateMaxEnd(node);
 			}
 			
 			return null;
