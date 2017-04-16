@@ -180,12 +180,39 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		System.out.println("-----------------------------------------");
 	}
 
-	/*
-	 * Method to check if necessary to update the max end, and then updating
-	 * if it does.
+	/**
+	 * Method to update the maxEnd value for a nodes sub-nodes.
+	 * 
+	 * @param node is node to be updated
+	 * @return the updated maxEnd for the node
 	 */
-
-	private void updateMaxEnd(){
+	private T updateMaxEnd(IntervalNode<T> node){
+		//Setting max end to the intervals end value, 
+		//will change if it needs to be updated
+		node.setMaxEnd(node.getInterval().getEnd());
+		
+		/*
+		 * Check both subtrees to see if maxEnd needs to be updated
+		 */
+		//Right 
+		if(!(node.getRightNode() == null)
+				//if the nodes current end is less than the end node, 
+				//update it to the larger value
+				&& node.getMaxEnd().compareTo(node.getRightNode().getMaxEnd()) < 0){
+			//Update to right nodes maxEnd
+			node.setMaxEnd(node.getRightNode().getMaxEnd());
+		}
+		//Left
+		if(!(node.getLeftNode() == null)
+				//if the nodes current end is less than the end node, 
+				//update it to the larger value
+				&& node.getMaxEnd().compareTo(node.getLeftNode().getMaxEnd()) < 0){
+			//Update to left nodes maxEnd
+			node.setMaxEnd(node.getLeftNode().getMaxEnd());
+		}
+	
+		//return the updated maxEnd 
+		return node.getMaxEnd();
 		
 	}
 }
