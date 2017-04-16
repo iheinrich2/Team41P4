@@ -1,3 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Semester:         CS367 Spring 2017
+// PROJECT:          team41_p3
+// FILE:             IntervalNode
+//
+// TEAM:    Team 41, IDGAF
+// Authors: 
+// Author1: (Jarrett Benson, jbenson6@wisc.edu, jbenson6, Lec 002)
+// Author2: (Cameron Carlson, ccarlson24@wisc.edu, ccarlson, Lec 002) 
+// Author3: (Isaac Heinrich, iheinrich@wisc.edu, iheinrich, Lec 002)  
+///////////////////////////////////////////////////////////////////////////////
+
 /**
  * This class defines the IntervalNode for the IntervalTree. This node has three
  * components: 1) interval - the data that we want to store in this node 2)
@@ -31,7 +43,6 @@ public class IntervalNode<T extends Comparable<T>> {
 	 *            the interval data member.
 	 */
 	public IntervalNode(IntervalADT<T> interval) {
-		// TODO
 		this.interval = interval;
 	}
 
@@ -42,12 +53,10 @@ public class IntervalNode<T extends Comparable<T>> {
 	 * @return in-order successor node
 	 */
 	public IntervalNode<T> getSuccessor() {
-		// TODO
 		if (rightNode != null) {
             return minValue(rightNode.getRightNode());
         }
 		else return null;
-		
 	}
 
 	/**
