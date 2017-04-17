@@ -11,16 +11,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /**
- * This class defines the IntervalNode for the IntervalTree. This node has three
- * components: 1) interval - the data that we want to store in this node 2)
- * maxEnd - this represents the maximum end of any interval stored in the tree
- * rooted at this node 3) leftNode and rightNode - the left and right node
- * references in the IntervalTree.
+ * This class manages the interval node and all its methods/fields, including
+ * the interval it contains, the maxEnd, its children, and methods to set
+ * and get these fields
  * 
- * This class will be used while constructing the IntervalTree.
+ * @authors see above
  *
  * @param <T>
- *            the template parameter for the data field - interval.
+ *            the type of interval start and end
  */
 
 public class IntervalNode<T extends Comparable<T>> {
@@ -43,6 +41,9 @@ public class IntervalNode<T extends Comparable<T>> {
 	 *            the interval data member.
 	 */
 	public IntervalNode(IntervalADT<T> interval) {
+		maxEnd = interval.getEnd();
+		leftNode = null;
+		rightNode = null;
 		this.interval = interval;
 	}
 
@@ -54,9 +55,13 @@ public class IntervalNode<T extends Comparable<T>> {
 	 */
 	public IntervalNode<T> getSuccessor() {
 		if (rightNode != null) {
-            return minValue(rightNode.getRightNode());
-        }
-		else return null;
+			IntervalNode<T> current = rightNode;
+			// go to the left most node
+			while (current.getLeftNode() != null)
+				current = current.getLeftNode();
+			return current;
+		} else
+			return null;
 	}
 
 	/**
@@ -137,17 +142,5 @@ public class IntervalNode<T extends Comparable<T>> {
 	public void setRightNode(IntervalNode<T> rightNode) {
 		this.rightNode = rightNode;
 	}
-	
-	/* Given a non-empty binary search tree, return the minimum data  
-    value found in that tree. Note that the entire tree does not need
-    to be searched. */
-   IntervalNode<T> minValue(IntervalNode<T> node) {
-	   IntervalNode<T> current = node;
 
-       /* loop down to find the leftmost leaf */
-       while (current.getLeftNode() != null) {
-           current = current.getLeftNode();
-       }
-       return current;
-   }
 }

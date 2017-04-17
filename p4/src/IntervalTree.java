@@ -13,17 +13,24 @@
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * This class follows the IntervalTreeADT and contains all methods and fields
+ * necessary, including methods to find intervals containing a point, all
+ * intervals that have a portion in a given interval, and addition and removal
+ * of intervals
+ * 
+ * @authors see above
+ *
+ * @param <T>
+ *            the type of interval start and end
+ */
 public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T> {
 
 	// Root node for the interval tree
 	private IntervalNode<T> root;
-	// Size of the interval tree
-	private int size;
-	// Height of the interval tree
-	private int height;
 
 	/**
-	 * Parameter-less constructor to just create a new interval tree with null
+	 * Parameterless constructor to just create a new interval tree with null
 	 * root
 	 */
 	public IntervalTree() {
@@ -49,51 +56,67 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	}
 
 	@Override
-	public void insert(IntervalADT<T> interval)
-					throws IllegalArgumentException {
-		//call to recursive method
-		//recursive always returns root node
-			root = insertHelper(this.root, interval);
+	/**
+	 * this method uses the given interval and calls the helper method to
+	 * properly insert it into the interval tree
+	 *
+	 * @param interval
+	 *            the interval to be added
+	 */
+	public void insert(IntervalADT<T> interval) throws IllegalArgumentException {
+		// call to recursive method
+		// recursive always returns root node
+		root = insertHelper(this.root, interval);
 	}
-	private IntervalNode<T> insertHelper(IntervalNode<T> node,
-					IntervalADT<T> interval) throws IllegalArgumentException {
-		//check if interval is valid
-		if (interval == null){
+
+	/**
+	 * this is the helper insert method. it traverses the tree until the
+	 * appropriate spot for the interval is located, the interval is added, and
+	 * maxEnd is updated if needed
+	 *
+	 * @param node
+	 *            the root node of the tree
+	 * @param interval
+	 *            the interval to be added
+	 * @return the node that is inserted
+	 */
+	private IntervalNode<T> insertHelper(IntervalNode<T> node, IntervalADT<T> interval)
+			throws IllegalArgumentException {
+		// check if interval is valid
+		if (interval == null) {
 			throw new IllegalArgumentException();
-		}
-		//check if current node is empty
-		else if (node == null){
-			//create new node with interval
+			// check if current node is empty
+		} else if (node == null) {
+			// create new node with interval
 			node = new IntervalNode<T>(interval);
-			//adjust node's max end
+			// adjust node's max end
 			node.setMaxEnd(node.getInterval().getEnd());
 			return node;
-		}
-		else { //traverse through list
+		} else { // traverse through list
 			int k = 0;
 			k = node.getInterval().compareTo(interval);
-			switch (k){
-			case 1: //if node is smaller than interval
-				//traverse through tree
+			switch (k) {
+			case 1: // if node is smaller than interval
+				// traverse through tree
 				IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
-				//adjust shape of tree
+				// adjust shape of tree
 				node.setLeftNode(newNode);
-				//check if maxEnd needs to be updated
-				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
+				// check if maxEnd needs to be updated
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0) {
 					node.setMaxEnd(interval.getEnd());
 				}
 				return node;
-			case -1: //if node is bigger than interval
-				//traverse through tree
+			case -1: // if node is bigger than interval
+				// traverse through tree
 				IntervalNode<T> diffNode = insertHelper(node.getRightNode(), interval);
-				//adjust shape of tree
+				// adjust shape of tree
 				node.setRightNode(diffNode);
-				//check if maxEnd needs to be updated
-				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
+				// check if maxEnd needs to be updated
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0) {
 					node.setMaxEnd(interval.getEnd());
 				}
 				return node;
-			default: //if node is equal to interval
+			default: // if node is equal to interval
 				throw new IllegalArgumentException();
 			}
 		}
@@ -136,6 +159,7 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	 */
 	public IntervalNode<T> deleteHelper(IntervalNode<T> node, IntervalADT<T> interval)
 			throws IntervalNotFoundException, IllegalArgumentException {
+
 		if (node == null) {
 			throw new IntervalNotFoundException(interval.toString());
 		}
@@ -143,100 +167,97 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		// If the interval is in the node, delete and replace with the in-order
 		// successor
 		if (node.getInterval().compareTo(interval) == 0) {
+
 			// if right child exists
 			if (!(node.getRightNode() == null)) {
-				// set interval to the in-order successors interval
-				node.setInterval(node.getSuccessor().getInterval());
-				deleteHelper(node.getSuccessor(), interval);
-
-				// Update the maxEnd
-
-				node.setMaxEnd(node.getSuccessor().getMaxEnd());
-
-				return node;
+				IntervalADT<T> suc = node.getSuccessor().getInterval();
+				node.setInterval(suc);
+				node.setRightNode(deleteHelper(node.getRightNode(), suc));
 			}
+
 			// if right child doesn't exist, return left child
-			if (node.getRightNode() == null) {
+			else
 				return node.getLeftNode();
-
-			}
 		}
+
 		// If interval is in the right subtree
 		if (node.getInterval().compareTo(interval) < 0) {
 			node.setRightNode(deleteHelper(node.getRightNode(), interval));
-			updateMaxEnd(node);
 
 		}
+
 		// If interval is in the left subtree
 		if (node.getInterval().compareTo(interval) > 0) {
 			node.setLeftNode(deleteHelper(node.getLeftNode(), interval));
-			updateMaxEnd(node);
 		}
 
-		return null;
-	}
+		// update maxEnd with children
+		IntervalNode<T> left = node.getLeftNode();
+		IntervalNode<T> right = node.getRightNode();
 
-	/**
-	 * Method to update the maxEnd value for a nodes sub-nodes.
-	 * 
-	 * @param node
-	 *            is node to be updated
-	 * @return the updated maxEnd for the node
-	 */
-	private T updateMaxEnd(IntervalNode<T> node) {
-		// Setting max end to the intervals end value,
-		// will change if it needs to be updated
-		node.setMaxEnd(node.getInterval().getEnd());
-
-		/*
-		 * Check both subtrees to see if maxEnd needs to be updated
-		 */
-		// Right
-		if (!(node.getRightNode() == null)
-				// if the nodes current end is less than the end node,
-				// update it to the larger value
-				&& node.getMaxEnd().compareTo(node.getRightNode().getMaxEnd()) < 0) {
-			// Update to right nodes maxEnd
-			node.setMaxEnd(node.getRightNode().getMaxEnd());
-		}
-		// Left
-		if (!(node.getLeftNode() == null)
-				// if the nodes current end is less than the end node,
-				// update it to the larger value
-				&& node.getMaxEnd().compareTo(node.getLeftNode().getMaxEnd()) < 0) {
-			// Update to left nodes maxEnd
-			node.setMaxEnd(node.getLeftNode().getMaxEnd());
+		// selects the biggest child
+		T childMax = null;
+		if (left != null && right != null) {
+			T lEnd = left.getMaxEnd();
+			T rEnd = right.getMaxEnd();
+			childMax = lEnd.compareTo(rEnd) > 0 ? lEnd : rEnd;
 		}
 
-		// return the updated maxEnd
-		return node.getMaxEnd();
+		else if (left != null && right == null)
+			childMax = left.getMaxEnd();
 
+		else if (left == null && right != null)
+			childMax = right.getMaxEnd();
+
+		// inherit maxEnd from biggest child or itself
+		T nodeEnd = node.getInterval().getEnd();
+		node.setMaxEnd(childMax != null && childMax.compareTo(nodeEnd) > 0 ? childMax : nodeEnd);
+
+		return node;
 	}
 
 	@Override
+	/**
+	 * this method calls it's helper method and passes the given interval to be
+	 * searched for as well as creates a result list and returns it
+	 *
+	 * @param interval
+	 *            the interval that will be searched for
+	 * @return a list of each interval that overlaps the given interval
+	 */
 	public List<IntervalADT<T>> findOverlapping(IntervalADT<T> interval) {
 		ArrayList<IntervalADT<T>> result = new ArrayList<IntervalADT<T>>();
 		findOverlappingHelper(root, interval, result);
 		return result;
 	}
 
+	/**
+	 * this method takes the given root node, interval, and result list, and
+	 * searches every node to see if the given interval overlaps with that
+	 * node's interval, and if so, adds it to the list
+	 *
+	 * @param node
+	 *            the root of the tree
+	 * @param interval
+	 *            the interval we are comparing against
+	 * @param result
+	 *            the list of results
+	 */
 	private void findOverlappingHelper(IntervalNode<T> node, IntervalADT<T> interval,
 			ArrayList<IntervalADT<T>> result) {
 		if (node == null)
 			return;
 		// if (start1 < end2 and > start2) or (end1 > start2 and < end1) it
 		// overlaps
-		if ((node.getInterval().getStart().compareTo(interval.getEnd()) <= 1
-				&& node.getInterval().getStart().compareTo(interval.getStart()) >= 1)
-				|| (node.getInterval().getEnd().compareTo(interval.getStart()) >= 1
-						&& node.getInterval().getEnd().compareTo(interval.getEnd()) <= 1)) {
+		if (node.getInterval().overlaps(interval))
 			result.add(node.getInterval());
-		}
-		if (node.getLeftNode().getMaxEnd().compareTo(interval.getStart()) >= 1) {
+
+		IntervalNode<T> child = node.getLeftNode();
+		if (child != null && child.getMaxEnd().compareTo(interval.getStart()) >= 0)
 			findOverlappingHelper(node.getLeftNode(), interval, result);
-		} else if (node.getRightNode().getMaxEnd().compareTo(interval.getStart()) >= 1) {
-			findOverlappingHelper(node.getLeftNode(), interval, result);
-		}
+		child = node.getRightNode();
+		if (child != null && child.getMaxEnd().compareTo(interval.getStart()) >= 0)
+			findOverlappingHelper(node.getRightNode(), interval, result);
 	}
 
 	@Override
@@ -279,10 +300,12 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		if (node.getInterval().contains(point)) {
 			output.add(node.getInterval());
 		}
-		// Recursive call to the right child
-		searchPointHelper(point, node.getRightNode(), output);
-		// Recursive call to left child
-		searchPointHelper(point, node.getLeftNode(), output);
+		IntervalNode<T> child = node.getLeftNode();
+		if (child != null && child.getMaxEnd().compareTo(point) >= 0)
+			searchPointHelper(point, node.getLeftNode(), output);
+		child = node.getRightNode();
+		if (child != null && child.getMaxEnd().compareTo(point) >= 0)
+			searchPointHelper(point, node.getRightNode(), output);
 	}
 
 	@Override
@@ -290,7 +313,21 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	 * Getter method for the size of the tree
 	 */
 	public int getSize() {
-		return size;
+		return sizeHelper(root);
+	}
+
+	/**
+	 * gets the size of the tree using a simple recursion
+	 *
+	 * @param node
+	 *            the root of the tree
+	 * @return the number of nodes the tree has (size)
+	 */
+	private int sizeHelper(IntervalNode<T> node) {
+		if (node == null)
+			return 0;
+		else
+			return sizeHelper(node.getLeftNode()) + sizeHelper(node.getRightNode()) + 1;
 	}
 
 	@Override
@@ -301,11 +338,18 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		return getHeightHelper(root);
 	}
 
-	private int getHeightHelper(IntervalNode<T> t) {
-		if (t == null)
+	/**
+	 * uses recursion and some comparisons to determine
+	 * the height of the interval tree
+	 *
+	 * @param node the root of the tree
+	 * @return the height of the tree
+	 */
+	private int getHeightHelper(IntervalNode<T> node) {
+		if (node == null)
 			return 0;
-		int leftHeight = getHeightHelper(t.getLeftNode());
-		int rightHeight = getHeightHelper(t.getRightNode());
+		int leftHeight = getHeightHelper(node.getLeftNode());
+		int rightHeight = getHeightHelper(node.getRightNode());
 		if (leftHeight > rightHeight)
 			return 1 + leftHeight;
 		else
@@ -349,11 +393,8 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 			return false;
 		}
 		// if they are equal, return true
-		if (node.getInterval().compareTo(interval) == 0) {
-			return true;
-		} else {
-			return false;
-		}
+		return containsHelper(node.getLeftNode(), interval) || containsHelper(node.getRightNode(), interval)
+				|| node.getInterval().compareTo(interval) == 0;
 	}
 
 	@Override
@@ -362,8 +403,8 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	 */
 	public void printStats() {
 		System.out.println("-----------------------------------------");
-		System.out.println("Height: " + height);
-		System.out.println("Size: " + size);
+		System.out.println("Height: " + getHeight());
+		System.out.println("Size: " + getSize());
 		System.out.println("-----------------------------------------");
 	}
 
