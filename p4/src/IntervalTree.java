@@ -2,7 +2,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Semester:         CS367 Spring 2017
 // PROJECT:          team41_p3
-// FILE:             Interval
+// FILE:             IntervalTree
 //
 // TEAM:    Team 41, IDGAF
 // Authors: 
@@ -300,12 +300,11 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 		if (node.getInterval().contains(point)) {
 			output.add(node.getInterval());
 		}
-		IntervalNode<T> child = node.getLeftNode();
-		if (child != null && child.getMaxEnd().compareTo(point) >= 0)
-			searchPointHelper(point, node.getLeftNode(), output);
-		child = node.getRightNode();
-		if (child != null && child.getMaxEnd().compareTo(point) >= 0)
-			searchPointHelper(point, node.getRightNode(), output);
+
+		// Recursive call to left child
+		searchPointHelper(point, node.getLeftNode(), output);
+		// Recursive call to the right child
+		searchPointHelper(point, node.getRightNode(), output);
 	}
 
 	@Override
@@ -339,10 +338,11 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	}
 
 	/**
-	 * uses recursion and some comparisons to determine
-	 * the height of the interval tree
+	 * uses recursion and some comparisons to determine the height of the
+	 * interval tree
 	 *
-	 * @param node the root of the tree
+	 * @param node
+	 *            the root of the tree
 	 * @return the height of the tree
 	 */
 	private int getHeightHelper(IntervalNode<T> node) {
@@ -393,8 +393,11 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 			return false;
 		}
 		// if they are equal, return true
-		return containsHelper(node.getLeftNode(), interval) || containsHelper(node.getRightNode(), interval)
-				|| node.getInterval().compareTo(interval) == 0;
+		if (node.getInterval().compareTo(interval) == 0) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@Override
