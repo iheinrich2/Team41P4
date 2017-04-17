@@ -49,39 +49,51 @@ public class IntervalTree<T extends Comparable<T>> implements IntervalTreeADT<T>
 	}
 
 	@Override
-	public void insert(IntervalADT<T> interval) throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-		root = insertHelper(this.root, interval);
-		size += 1;
+	public void insert(IntervalADT<T> interval)
+					throws IllegalArgumentException {
+		//call to recursive method
+		//recursive always returns root node
+			root = insertHelper(this.root, interval);
 	}
-
-	private IntervalNode<T> insertHelper(IntervalNode<T> node, IntervalADT<T> interval)
-			throws IllegalArgumentException {
-		if (interval == null) {
+	private IntervalNode<T> insertHelper(IntervalNode<T> node,
+					IntervalADT<T> interval) throws IllegalArgumentException {
+		//check if interval is valid
+		if (interval == null){
 			throw new IllegalArgumentException();
-		} else if (node == null) {
+		}
+		//check if current node is empty
+		else if (node == null){
+			//create new node with interval
 			node = new IntervalNode<T>(interval);
+			//adjust node's max end
 			node.setMaxEnd(node.getInterval().getEnd());
 			return node;
-		} else {
+		}
+		else { //traverse through list
 			int k = 0;
 			k = node.getInterval().compareTo(interval);
-			switch (k) {
-			case 1:
+			switch (k){
+			case 1: //if node is smaller than interval
+				//traverse through tree
 				IntervalNode<T> newNode = insertHelper(node.getLeftNode(), interval);
+				//adjust shape of tree
 				node.setLeftNode(newNode);
-				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0) {
+				//check if maxEnd needs to be updated
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
 					node.setMaxEnd(interval.getEnd());
 				}
 				return node;
-			case -1:
+			case -1: //if node is bigger than interval
+				//traverse through tree
 				IntervalNode<T> diffNode = insertHelper(node.getRightNode(), interval);
+				//adjust shape of tree
 				node.setRightNode(diffNode);
-				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0) {
+				//check if maxEnd needs to be updated
+				if (interval.getEnd().compareTo(node.getMaxEnd()) > 0){
 					node.setMaxEnd(interval.getEnd());
 				}
 				return node;
-			default:
+			default: //if node is equal to interval
 				throw new IllegalArgumentException();
 			}
 		}
